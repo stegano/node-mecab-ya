@@ -23,7 +23,7 @@ cd $BUILD_PATH
 curl -OL $URL_MECAB
 tar xfz $DIR_MECAB.tar.gz
 cd $DIR_MECAB
-./configure --prefix=$PROJECT_HOME/mecab
+./configure --prefix=$PROJECT_HOME/mecab --build=--aarch64-unknown-linux-gnu
 make
 make install
 
@@ -34,7 +34,7 @@ tar xfz $DIR_MECAB_DIC.tar.gz
 cd $DIR_MECAB_DIC
 export PATH=$PROJECT_HOME/mecab/bin:$PATH
 ./autogen.sh
-./configure --prefix=$PROJECT_HOME/mecab
+./configure --prefix=$PROJECT_HOME/mecab --build=aarch64-unknown-linux-gnu
 make
 make install
 
