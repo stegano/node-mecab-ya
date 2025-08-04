@@ -8,7 +8,7 @@ var MECAB_LIB_PATH =
 
 var buildCommand = function (text) {
     return 'LD_LIBRARY_PATH=' + MECAB_LIB_PATH + ' ' +
-        sq.quote(['echo', text]) + ' | ' + MECAB_LIB_PATH + '/bin/mecab';
+        sq.quote(['echo', text]) + ' | ' + MECAB_LIB_PATH + '/bin/mecab -b 65536';
 };
 
 var execMecab = function (text, callback) {
