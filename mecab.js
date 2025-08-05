@@ -112,12 +112,9 @@ var allSync = function (text) {
 
 const { spawn } = require('child_process');
 
-const MECAB_PATH = __dirname + '/mecab';
-const MECAB_BIN = `${MECAB_PATH}/bin/mecab`;
-const ENV    = { ...process.env, LD_LIBRARY_PATH: MECAB_PATH };
-const proc  = spawn(MECAB_BIN, ['-b', '65536'], { env: ENV });
-let  buf  = '';
+const proc = spawn(MECAB_LIB_PATH + '/bin/mecab', ['-b', '65536'], { env: { ...process.env } });
 const queue = [];
+let  buf  = '';
 
 proc.stdout.on('data', chunk => {
  buf += chunk.toString();
