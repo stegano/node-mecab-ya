@@ -110,13 +110,51 @@ var allSync = function (text) {
     return parseSync(text, 'all');
 }
 
+const { spawn } = require('child_process');
+
+const MECAB_PATH = __dirname + '/mecab';
+const MECAB_BIN = `${MECAB_PATH}/bin/mecab`;
+const ENV    = { ...process.env, LD_LIBRARY_PATH: MECAB_PATH };
+const proc  = spawn(MECAB_BIN, ['-b', '65536'], { env: ENV });
+let  buf  = '';
+const queue = [];
+
+proc.stdout.on('data', chunk => {
+ buf += chunk.toString();
+ if (buf.endsWith('EOS\n')) {
+  const raw = buf.slice(0, -4); // 'EOS\n' 제거
+  buf = '';
+  const result = raw
+   .split('\n')
+   .reduce((arr, line) => {
+    const [surface, feat] = line.split('\t');
+    if (feat) {
+     arr.push([ surface, feat.split(',')[0] ]);
+    }
+    return arr;
+   }, []);
+
+  // 큐에서 대기 중인 resolve 호출
+  const cb = queue.shift();
+  if (cb) cb(result);
+ }
+});
+
+function cmd(text) {
+ return new Promise(resolve => {
+  queue.push(resolve);
+  proc.stdin.write(text.replace(/\n/g, ' ') + '\n');
+ });
+}
+
 module.exports = {
-    pos: pos,
-    morphs: morphs,
-    nouns: nouns,
-    all: all,
-    posSync: posSync,
-    morphsSync: morphsSync,
-    nounsSync: nounsSync,
-    allSync: allSync,
+  pos: pos,
+  morphs: morphs,
+  nouns: nouns,
+  all: all,
+  posSync: posSync,
+  morphsSync: morphsSync,
+  nounsSync: nounsSync,
+  allSync: allSync,
+  cmd
 };
